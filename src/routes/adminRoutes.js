@@ -1,7 +1,7 @@
 const express=require("express")
 const router=express.Router();
 const admincontroller=require("../controllers/admincontroller")
-const auth = require("../auth");
+const auth = require("../middleware/auth");
 
 
 // =================================

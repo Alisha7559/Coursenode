@@ -1,16 +1,55 @@
 const Order = require("../models/order");
+const Student = require("../models/student");
+const Course = require("../models/course");
+const Institution = require("../models/institmodel");
+
 
 // ================= CREATE ORDER =================
 exports.createOrder = async (req, res) => {
-  try {
-    const { student, course, institution, price, status } = req.body;
+  
+     const studentid= req.user; // ✅ from token
+   try {
 
+    
+    if (!studentid) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid student ID"
+      });
+    }
+    const student= await Student.findById(studentid).select("-password")
+    if(!student){
+      return res.status(400).json({
+        success: false,
+        message: "Invalid student "
+      });
+    }
+     const {course }=req.body
+     if(!course ){
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course and price "
+      });
+     }
+
+    // ✅ CHECK COURSE EXISTS
+    const courseExists = await Course.findById(course);
+    if (!courseExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course ID"
+      });
+    }
+// console.log(courseExists.institutionid)
+   
+
+    // ✅ CREATE ORDER ONLY IF ALL VALID
     const order = await Order.create({
-      student,
+      student:studentid ,
       course,
-      institution,
-      price,
-      status
+      institution:courseExists.institutionid,
+      price:courseExists.fees,
+      
     });
 
     const populatedOrder = await Order.findById(order._id)
@@ -24,12 +63,15 @@ exports.createOrder = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(400).json({
+
+    res.status(500).json({
       success: false,
       message: error.message
     });
+
   }
 };
+
 
 // ================= GET INSTITUTION ORDERS =================
 exports.getInstitutionOrders = async (req, res) => {

@@ -34,9 +34,10 @@ Status: {
     type: String
   },
 
-  institution: {
-    type: String,
-    required: true
+  institutionid: {
+    type: mongoose.Schema.Types.ObjectId,
+      ref: "Institution",
+      required: true
   },
 
 //   location: {
@@ -53,7 +54,10 @@ Status: {
 //     type: Number,
 //     required: true
 //   },
-
+subcategory:{
+   type: String,
+    enum: [ "Degree","Diploma" ],
+},
 fees: {
     type: Number,
     required: true

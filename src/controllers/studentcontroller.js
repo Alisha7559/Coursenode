@@ -146,11 +146,17 @@ exports.loginStudent = async (req, res) => {
     }
 
     // create token
-    const token = jwt.sign(
-      { id: student._id },
-      process.env.JWT_SECRET || "secretkey",
-      { expiresIn: "1h" }
-    );
+   const token = jwt.sign(
+  { id: student._id },
+process.env.SECRET_KEY,
+  { expiresIn: "1h" }
+);
+
+  res.cookie("token", token, {
+  httpOnly: true,
+  secure: false, // true only in https
+  sameSite: "lax"
+});
 
     res.status(200).json({
       message: "Login successful",
