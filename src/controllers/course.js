@@ -3,22 +3,40 @@ const Course = require("../models/course");
 /* CREATE COURSE */
 exports.createCourse = async (req, res) => {
   try {
-    const { courseName, category,institutionid, mode, fees, totalSeats } = req.body;
+    // Destructure required fields from req.body
+    const { courseName, category, subcategory, institution, fees, totalSeats, mode, status, approval, location, description } = req.body;
 
+    // Get image filenames from multer
+    const images = req.files ? req.files.map(f => f.filename) : [];
+
+    // Create course in DB
     const course = await Course.create({
       courseName,
       category,
-      institutionid,
-      mode,
+      subcategory,
+      institution,
       fees,
-      totalSeats
+      totalSeats,
+      mode,
+      status,
+      approval,
+      location,
+      description,
+      images
     });
+  
+
+    // ✅ Populate after create
+    const populatedCourse = await Course.findById(course._id)
+    .populate("category", "name ")
+      .populate("institution", "name email description");
 
     res.status(201).json({
       success: true,
       message: "Course added successfully",
-      data: course
+      data: populatedCourse
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -28,16 +46,27 @@ exports.createCourse = async (req, res) => {
   }
 };
 
+    
+
 /* GET ALL COURSES */
 exports.getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find();
-    res.status(200).json({ success: true, data: courses });
+
+    const courses = await Course.find()
+    .populate("category", "name ")
+    .populate('subcategory', '_id name')
+.populate("institution", "name email description");
+  
+
+    res.json({
+      success: true,
+      data: courses
+    });
+
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to load courses",
-      error: error.message
+      message: error.message
     });
   }
 };
@@ -45,7 +74,9 @@ exports.getAllCourses = async (req, res) => {
 /* GET COURSE BY ID */
 exports.getCourseById = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+ const course = await Course.findById(req.params.id)
+.populate("institution", "name email description");
+
 
     if (!course)
       return res.status(404).json({ success: false, message: "Course not found" });

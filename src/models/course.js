@@ -15,12 +15,15 @@ const courseSchema = new Schema({
   },
 
   category: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "category",   // ✅ VERY IMPORTANT
     required: true
   },
 
-Seats: {
-    type: String
+
+  totalSeats: {
+    type: Number,
+    required: true
   },
 
 //   difficultyLevel: {
@@ -30,12 +33,15 @@ Seats: {
 
 //   skillsCovered: [{ type: String }],
 
-Status: {
-    type: String
+ status: {
+    type: String,
+    enum: ["Active", "Inactive"],
+    default: "Active"
   },
 
   institution: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Institution",  // institution model
     required: true
   },
 
@@ -58,6 +64,7 @@ fees: {
     type: Number,
     required: true
   },
+subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", required: true }
 
 //   ratingAverage: {
 //     type: Number,

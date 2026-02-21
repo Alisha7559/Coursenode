@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const courseSubCategorySchema = new Schema({
+
   name: {
     type: String,
     required: true,
@@ -11,32 +12,34 @@ const courseSubCategorySchema = new Schema({
   description: {
     type: String
   },
+
   image: {
-    type: String 
-      // image file path
+    type: String
+  },
+
+  // ✅ VERY IMPORTANT (Link to Category)
+  categoryId: {
+    type: Schema.Types.ObjectId,
+    ref: "category",
+    required: true
+  },
+
+  // ✅ Who created (Admin)
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "admin",
+    required: true
+  },
+
+  // ✅ status control
+  isActive: {
+    type: Boolean,
+    default: true
   }
 
-//   categoryId: {
-//     type: Schema.Types.ObjectId,
-//     ref: "CourseCategory",
-//     required: true
-//   },
+}, { timestamps: true });
 
-//   icon: {
-//     type: String
-//   },
-
-//   isActive: {
-//     type: Boolean,
-//     default: true
-//   },
-
-//   createdAt: {
-//     type: Date,
-//     default: Date.now
-//   }
-});
-
-const CourseSubCategory = mongoose.model("CourseSubCategory",courseSubCategorySchema);
-
-module.exports = CourseSubCategory;
+module.exports = mongoose.model(
+  "CourseSubCategory",
+  courseSubCategorySchema
+);

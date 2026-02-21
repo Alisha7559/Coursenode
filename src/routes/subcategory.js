@@ -3,11 +3,12 @@ const router = express.Router();
 
 const subCategoryController = require("../controllers/subcategory");
 const upload = require("../middleware/upload"); // multer middleware
+const auth = require("../middleware/auth");
 
 // CREATE (with image)
 router.post(
   "/add-subcategory",
-  upload.single("image"),   // image field name
+  upload.single("image"),  auth, // image field name
   subCategoryController.createSubCategory
 );
 
@@ -24,5 +25,6 @@ router.patch(
 
 // DELETE
 router.delete("/subcategories/:id", subCategoryController.deleteSubCategory);
+router.get("/by-category/:categoryId", auth, subCategoryController.getSubCategoryByCategory);
 
 module.exports = router;

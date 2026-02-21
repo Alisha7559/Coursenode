@@ -14,6 +14,8 @@ const studentRouter = require("./src/routes/studentRoutes");
 const adminRouter=require("./src/routes/adminRoutes")
 const reviewRouter=require("./src/routes/reviewRoutes")
 const orderRouter=require("./src/routes/oderRoutes")
+const categoryRouter=require("./src/routes/categoryRoutes")
+
 
 const app = express();
 const port = process.env.PORT || 7000;
@@ -37,6 +39,8 @@ app.use("/api", studentRouter);
 app.use("/api",adminRouter);
 app.use("/api",reviewRouter);
 app.use("/api",orderRouter);
+app.use("/api",categoryRouter);
+
 
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);

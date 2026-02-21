@@ -1,86 +1,231 @@
 const CourseSubCategory = require("../models/coursesubcategory");
 
+
 /* ================= CREATE ================= */
-const createSubCategory = async (req, res) => {
+exports.createSubCategory = async (req, res) => {
+
   try {
-    const { name, description, categoryId, icon, isActive } = req.body;
+
+    const { name, description, categoryId,createdBy, isActive } = req.body;
+
     const image = req.file ? req.file.filename : null;
 
-    const subCategory = new CourseSubCategory({
+
+    const subCategory = await CourseSubCategory.create({
+
       name,
+
       description,
+
       categoryId,
-      icon,
+      createdBy: req.user,
       image,
+
+      createdBy: req.user, // from JWT middleware
+
       isActive
+
     });
 
-    await subCategory.save();
-    res.status(201).json(subCategory);
-  } catch (error) {
-    res.status(500).send(error.message);
+
+    res.status(201).json({
+
+      success: true,
+
+      message: "SubCategory created",
+
+      data: subCategory
+
+    });
+
   }
+
+  catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
 };
+
+
 
 /* ================= GET ALL ================= */
-const getAllSubCategories = async (req, res) => {
+exports.getAllSubCategories = async (req, res) => {
+
   try {
-    const data = await CourseSubCategory.find();
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).send(error.message);
+
+    const data = await CourseSubCategory.find()
+
+      .populate("categoryId", "name")   // show category name
+
+      .populate("createdBy", "name email");
+
+
+    res.json({
+
+      success: true,
+
+      data
+
+    });
+
   }
+
+  catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
 };
 
-/* ================= GET BY ID ================= */
-const getSubCategoryById = async (req, res) => {
+
+
+/* ================= GET ONE ================= */
+exports.getSubCategoryById = async (req, res) => {
+
   try {
-    const data = await CourseSubCategory.findById(req.params.id);
-    if (!data) return res.status(404).send("Subcategory not found");
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).send(error.message);
+
+    const data = await CourseSubCategory.findById(req.params.id)
+
+      .populate("categoryId", "name");
+
+
+    res.json({
+
+      success: true,
+
+      data
+
+    });
+
   }
+
+  catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
 };
+
+
 
 /* ================= UPDATE ================= */
-const updateSubCategory = async (req, res) => {
- 
-  
+exports.updateSubCategory = async (req, res) => {
+
   try {
+
     if (req.file) {
+
       req.body.image = req.file.filename;
+
     }
 
+
     const updated = await CourseSubCategory.findByIdAndUpdate(
+
       req.params.id,
+
       req.body,
+
       { new: true }
+
     );
 
-    if (!updated) return res.status(404).send("Subcategory not found");
 
-    res.status(200).json(updated);
-  } catch (error) {
-    res.status(500).send(error.message);
+    res.json({
+
+      success: true,
+
+      message: "Updated",
+
+      data: updated
+
+    });
+
   }
+
+  catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
 };
+
+
 
 /* ================= DELETE ================= */
-const deleteSubCategory = async (req, res) => {
-  try {
-    const deleted = await CourseSubCategory.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).send("Subcategory not found");
-    res.status(200).send("Deleted successfully");
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-};
+exports.deleteSubCategory = async (req, res) => {
 
-module.exports = {
-  createSubCategory,
-  getAllSubCategories,
-  getSubCategoryById,
-  updateSubCategory,
-  deleteSubCategory
+  try {
+
+    await CourseSubCategory.findByIdAndDelete(req.params.id);
+
+
+    res.json({
+
+      success: true,
+
+      message: "Deleted"
+
+    });
+
+  }
+
+  catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
+};
+// =========getSubCategoryByCategory=====
+exports.getSubCategoryByCategory = async (req, res) => {
+
+ const data = await CourseSubCategory.find({
+
+   categoryId: req.params.categoryId,
+
+   isActive: true
+
+ });
+
+ res.json({
+   success: true,
+   data
+ });
+
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const courseController = require("../controllers/course");
+const upload = require("../middleware/upload"); // adjust the path if needed
 
 /* CREATE COURSE */
 router.post("/institute/course", courseController.createCourse);
@@ -16,5 +17,5 @@ router.put("/institute/course/:id", courseController.updateCourse);
 
 /* DELETE COURSE */
 router.delete("/institute/course/:id", courseController.deleteCourse);
-
+router.post("/course", upload.array("images"), courseController.createCourse);
 module.exports = router;
