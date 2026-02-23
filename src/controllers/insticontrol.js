@@ -93,9 +93,9 @@ exports.getInstiById = async (req, res) => {
 exports.getInstiFromToken = async (req, res) => {
   try {
     const insti_id = req.user; // set by auth middleware
-
+    
     const institution = await Institution
-      .findById(insti_id)
+      .findById(insti_id.id)
       .select("-password");
 
     if (!institution)

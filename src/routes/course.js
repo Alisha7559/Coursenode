@@ -1,21 +1,23 @@
-const express = require("express");
+const express = require ("express");
 const router = express.Router();
+
 const courseController = require("../controllers/course");
-const upload = require("../middleware/upload"); // adjust the path if needed
 
-/* CREATE COURSE */
-router.post("/institute/course", courseController.createCourse);
+const upload = require("../middleware/upload");
 
-/* GET ALL COURSES */
-router.get("/institute/getcourse", courseController.getAllCourses);
+const auth=require("../middleware/auth");
 
-/* GET COURSE BY ID */
-router.get("/institute/course/:id", courseController.getCourseById);
 
-/* UPDATE COURSE */
-router.put("/institute/course/:id", courseController.updateCourse);
+// ✅ CREATE COURSE (FIXED)
+router.post("/institute/course", auth, upload.array("images"), courseController.createCourse);
 
-/* DELETE COURSE */
-router.delete("/institute/course/:id", courseController.deleteCourse);
-router.post("/course", upload.array("images"), courseController.createCourse);
+router.get("/institute/allcourse", auth, courseController.getAllCourses);
+
+router.get("/institute/course", auth, courseController.getCourseById);
+
+router.put("/institute/course/:id", auth, courseController.updateCourse);
+
+router.delete("/institute/course/:id", auth, courseController.deleteCourse);
+
+
 module.exports = router;

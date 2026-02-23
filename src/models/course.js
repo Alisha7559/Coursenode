@@ -54,6 +54,11 @@ const courseSchema = new Schema({
     enum: ["Online", "Offline", ],
     default: "Online"
   },
+  images: [
+   {
+     type: String
+   }
+ ],
 
 //   duration: {
 //     type: Number,

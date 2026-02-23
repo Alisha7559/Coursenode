@@ -20,7 +20,7 @@ const categoryRouter=require("./src/routes/categoryRoutes")
 const app = express();
 const port = process.env.PORT || 7000;
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "http://localhost:3001"],
   credentials: true
 }));
 
