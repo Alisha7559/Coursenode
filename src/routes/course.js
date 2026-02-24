@@ -15,6 +15,8 @@ router.get("/institute/allcourse", auth, courseController.getAllCourses);
 
 router.get("/institute/course", auth, courseController.getCourseById);
 
+router.get("/course/:id", auth,courseController. getSingleCourseById);
+
 router.put("/institute/course/:id", auth, courseController.updateCourse);
 
 router.delete("/institute/course/:id", auth, courseController.deleteCourse);

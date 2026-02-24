@@ -95,6 +95,46 @@ exports.getAllCourses = async (req, res) => {
     });
   }
 };
+// get a single course
+exports.getSingleCourseById = async (req, res) => {
+
+  try {
+
+    const course = await Course.findById(req.params.id)
+      .populate("category", "name")
+      .populate("subcategory", "name")
+      .populate("institution", "name email description");
+
+    if (!course) {
+
+      return res.status(404).json({
+
+        success: false,
+        message: "Course not found"
+
+      });
+
+    }
+
+    res.status(200).json({
+
+      success: true,
+      data: course
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      success: false,
+      message: error.message
+
+    });
+
+  }
+
+};
 
 /* UPDATE COURSE */
 exports.updateCourse = async (req, res) => {
