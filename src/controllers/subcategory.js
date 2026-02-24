@@ -6,9 +6,9 @@ exports.createSubCategory = async (req, res) => {
 
   try {
 
-    const { name, description, categoryId,createdBy, isActive } = req.body;
+    const { name, description, categoryId, isActive } = req.body;
 
-    const image = req.file ? req.file.filename : null;
+  
 
 
     const subCategory = await CourseSubCategory.create({
@@ -18,10 +18,10 @@ exports.createSubCategory = async (req, res) => {
       description,
 
       categoryId,
-      createdBy: req.user,
-      image,
+     
+      
 
-      createdBy: req.user, // from JWT middleware
+      createdBy: req.user.id, // from JWT middleware
 
       isActive
 

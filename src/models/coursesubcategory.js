@@ -13,9 +13,7 @@ const courseSubCategorySchema = new Schema({
     type: String
   },
 
-  image: {
-    type: String
-  },
+  
 
   // ✅ VERY IMPORTANT (Link to Category)
   categoryId: {

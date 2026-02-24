@@ -4,25 +4,38 @@ exports.createCategory = async (req, res) => {
 
   try {
 
-    // ✅ Check role
     if (req.user.role !== "admin") {
 
       return res.status(403).json({
-
         success: false,
         message: "Only admin can create category"
-
       });
 
     }
 
-    const { name } = req.body;
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
+    // ✅ text field
+    const name = req.body.name;
+
+    // ✅ file field
+    const image = req.file ? req.file.filename : null;
+
+    if (!name) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Category name required"
+      });
+
+    }
 
     const category = await Category.create({
 
       name,
-
-      createdBy: req.user.id   // from JWT middleware
+      image,
+      createdBy: req.user.id
 
     });
 
@@ -36,10 +49,8 @@ exports.createCategory = async (req, res) => {
   } catch (error) {
 
     res.status(500).json({
-
       success: false,
       message: error.message
-
     });
 
   }
