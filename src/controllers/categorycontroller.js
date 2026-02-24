@@ -5,7 +5,7 @@ exports.createCategory = async (req, res) => {
   try {
 
     // ✅ Check role
-    if (req.role !== "admin") {
+    if (req.user.role !== "admin") {
 
       return res.status(403).json({
 
@@ -22,7 +22,7 @@ exports.createCategory = async (req, res) => {
 
       name,
 
-      createdBy: req.user   // from JWT middleware
+      createdBy: req.user.id   // from JWT middleware
 
     });
 

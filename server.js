@@ -15,6 +15,7 @@ const adminRouter=require("./src/routes/adminRoutes")
 const reviewRouter=require("./src/routes/reviewRoutes")
 const orderRouter=require("./src/routes/oderRoutes")
 const categoryRouter=require("./src/routes/categoryRoutes")
+const feedbackRoutes = require("./src/routes/feedback");
 
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api",adminRouter);
 app.use("/api",reviewRouter);
 app.use("/api",orderRouter);
 app.use("/api",categoryRouter);
+app.use("/api/feedback", feedbackRoutes);
 
 
 app.listen(port, () => {
