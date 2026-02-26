@@ -10,12 +10,12 @@ const feedbackSchema = new Schema({
   },
   studentid: {
     type: Schema.Types.ObjectId,
-    ref: "student",   
+    ref: "Student",   
     required: true
   },
    courseid: {
     type: Schema.Types.ObjectId,
-    ref: "course",   
+    ref: "Course",   
     required: true
   },
   message: {

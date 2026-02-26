@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const courseSchema = new Schema({
-  // courseid :{
+  // couseid :{
   //   type: String,
   //   required: true,
   //   trim: true
@@ -45,9 +45,9 @@ const courseSchema = new Schema({
     required: true
   },
 
-//   location: {
-//     type: String
-//   },
+  location: {
+    type: String
+  },
 
   mode: {
     type: String,
@@ -69,7 +69,7 @@ fees: {
     type: Number,
     required: true
   },
-subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", required: true }
+subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", required: true },
 
 //   ratingAverage: {
 //     type: Number,
@@ -97,20 +97,20 @@ subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", r
 //   prerequisites: [{ type: String }],
 
   
-//   syllabus: [
-//     {
-//       moduleTitle: {
-//         type: String,
-//         required: true
-//       },
-//       topics: [
-//         {
-//           type: String,
-//           required: true
-//         }
-//       ]
-//     }
-//   ],
+  modules: [
+    {
+      title: {
+        type: String,
+        required: true
+      },
+      description: [
+        {
+          type: String,
+          required: true
+        }
+      ]
+    }
+  ],
 
 //   thumbnail: {
 //     type: String

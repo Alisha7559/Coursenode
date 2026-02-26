@@ -4,10 +4,10 @@ const feedbackController = require("../controllers/feedback");
 const authMiddleware = require("../middleware/auth"); // your JWT middleware
 
 // Create feedback (Student)
-router.post("/", authMiddleware, feedbackController.createFeedback);
+router.post("/feedback", authMiddleware, feedbackController.createFeedback);
 
 // Get all feedback (Admin)
-router.get("/", authMiddleware, feedbackController.getAllFeedback);
+router.get("/feedback", authMiddleware, feedbackController.getAllFeedback);
 
 // Get logged-in student feedback
 router.get("/my", authMiddleware, feedbackController.getMyFeedback);

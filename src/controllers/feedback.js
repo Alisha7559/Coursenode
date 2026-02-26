@@ -1,14 +1,28 @@
 const Feedback = require("../models/feedback");
+const Course = require("../models/course");
 
 // ================= CREATE FEEDBACK =================
 exports.createFeedback = async (req, res) => {
+  console.log(req.body);
+   const studentid = req.user.id
+  
   try {
-    const { rating, message } = req.body;
+    const { rating, message, courseid,  } = req.body;
+
+    // check course exists
+    const course = await Course.findById(courseid);
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found"
+      });
+    }
 
     const feedback = await Feedback.create({
       rating,
       message,
-      studentid: req.user.id   // from auth middleware
+      studentid, // from token
+      courseid: course._id
     });
 
     res.status(201).json({
@@ -30,7 +44,8 @@ exports.createFeedback = async (req, res) => {
 exports.getAllFeedback = async (req, res) => {
   try {
     const feedbacks = await Feedback.find()
-      .populate("studentid", "name email") // show student details
+      .populate("studentid", "email")
+      .populate("courseid", "courseName")
       .sort({ submitted_at: -1 });
 
     res.status(200).json({
@@ -48,12 +63,13 @@ exports.getAllFeedback = async (req, res) => {
 };
 
 
-// ================= GET SINGLE STUDENT FEEDBACK =================
+// ================= GET MY FEEDBACK =================
 exports.getMyFeedback = async (req, res) => {
   try {
     const feedback = await Feedback.find({
       studentid: req.user.id
-    });
+    })
+      .populate("courseid", "courseName");
 
     res.status(200).json({
       success: true,

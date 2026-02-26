@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "admin", // ✅ your admin model
+        ref: "admin", 
         required: true
     },
 

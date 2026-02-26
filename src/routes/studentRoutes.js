@@ -1,36 +1,26 @@
-const express=require("express")
-const router=express.Router();
-const studentcontroller=require("../controllers/studentcontroller")
+const express = require("express");
+const router = express.Router();
+const studentcontroller = require("../controllers/studentcontroller");
 
-// =================================
-//          register STUDENT
-// =================================
+// REGISTER
+router.post("/register", studentcontroller.registerStudent);
 
-router.post("/student/register", studentcontroller.registerStudent);
+// LOGIN
+router.post("/login", studentcontroller.loginStudent);
 
+// LOGOUT
+router.post("/logout", studentcontroller.logoutStudent);
 
-// =================================
-//          READ STUDENT
-// =================================
-router.get('/getstudent/:id',studentcontroller.findStudent)
-router.get("/getallstudents",studentcontroller.getAllStudents);
+// GET ALL
+router.get("/", studentcontroller.getAllStudents);
 
+// GET ONE
+router.get("/:id", studentcontroller.findStudent);
 
+// UPDATE
+router.put("/:id", studentcontroller.updateStudent);
 
+// DELETE
+router.delete("/:id", studentcontroller.deleteStudent);
 
-// =================================
-//         UPDATE STUDENT
-// =================================
-router.put('/updatestudent/:id',studentcontroller.updateStudent)
-
-
-// =================================
-//          DELETE STUDENT
-// =================================
-router.delete('/deletestudent/:id',studentcontroller.deleteStudent)
-
-// =================================
-//          LOGIN STUDENT
-// =================================
-router.post("/student/login", studentcontroller.loginStudent);
-module.exports =router
+module.exports = router;
