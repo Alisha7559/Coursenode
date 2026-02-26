@@ -1,35 +1,36 @@
-const mongoose=require("mongoose")
+const mongoose = require("mongoose")
 const Course = require("../models/course");
 
 /* CREATE COURSE */
 exports.createCourse = async (req, res) => {
-     console.log("BODY:", req.body);
+  console.log("BODY:", req.body);
 
-    console.log("FILES:", req.files);
+  console.log("FILES:", req.files);
   try {
     const { courseName, category, subcategory, fees, totalSeats, mode, status, approval, location, description } = req.body;
 
     // const images = req.files ? req.files.map(f => f.filename) : [];
-   const images = req.files ? req.files.map(f => `uploads/${f.filename}`) : [];
+    const images = req.files ? req.files.map(f => `uploads/${f.filename}`) : [];
 
-    console.log("path:", images);
+const modules = req.body.modules
+  ? JSON.parse(req.body.modules)
+  : [];
 
-    // Use the logged-in institute's ID safely
-    const course = await Course.create({
-      courseName,
-      category,
-      subcategory,
-institution: new mongoose.Types.ObjectId(req.user.id),
-      fees,
-      totalSeats,
-      mode,
-      status,
-      approval,
-      location,
-      description,
-      images
-    });
-
+const course = await Course.create({
+  courseName,
+  category,
+  subcategory,
+  institution: new mongoose.Types.ObjectId(req.user.id),
+  fees,
+  totalSeats,
+  mode,
+  status,
+  approval,
+  location,
+  description,
+  images,
+  modules
+});
     const populatedCourse = await Course.findById(course._id)
       .populate("category", "name")
       .populate("subcategory", "name")
@@ -49,17 +50,17 @@ institution: new mongoose.Types.ObjectId(req.user.id),
   }
 };
 
-    
+
 
 /* GET  COURSES by id */
 exports.getCourseById = async (req, res) => {
   try {
 
     const courses = await Course.find({ institution: req.user.id })
-  .populate("category", "name")
-  .populate("subcategory", "_id name")
-  .populate("institution", "name email description");
-  
+      .populate("category", "name")
+      .populate("subcategory", "_id name")
+      .populate("institution", "name email description");
+
 
     res.json({
       success: true,
@@ -77,9 +78,9 @@ exports.getCourseById = async (req, res) => {
 /* GET all COURSE */
 exports.getAllCourses = async (req, res) => {
   try {
- const course = await Course.find()
- .populate("category", "name")
-.populate("institution", "name email description");
+    const course = await Course.find()
+      .populate("category", "name")
+      .populate("institution", "name email description");
 
 
 
@@ -142,8 +143,8 @@ exports.updateCourse = async (req, res) => {
   try {
     _id = req.params.id
     const course = await Course.findByIdAndUpdate(
-      
-    _id,
+
+      _id,
       req.body,
       { new: true }
     );
