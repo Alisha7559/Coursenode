@@ -15,12 +15,12 @@ const adminRouter = require("./src/routes/adminRoutes");
 const reviewRouter = require("./src/routes/reviewRoutes");
 const orderRouter = require("./src/routes/oderRoutes");
 const categoryRouter = require("./src/routes/categoryRoutes");
+const enquiryRouter = require("./src/routes/enquiryRoutes");
 const feedbackRoutes = require("./src/routes/feedback");
 
 const app = express();
 const port = process.env.PORT || 7000;
 
-// ✅ CORS for Cookies
 app.use(cors({
   origin: ["http://localhost:3000", "http://localhost:3001"],
   credentials: true
@@ -41,6 +41,10 @@ app.use("/api", adminRouter);
 app.use("/api", reviewRouter);
 app.use("/api", orderRouter);
 app.use("/api", categoryRouter);
+
+// ✅ FIXED HERE
+app.use("/api/enquiry", enquiryRouter);
+
 app.use("/api/feedback", feedbackRoutes);
 
 app.listen(port, () => {
