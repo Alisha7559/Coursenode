@@ -18,6 +18,11 @@ const feedbackSchema = new Schema({
     ref: "Course",   
     required: true
   },
+  instituteid: {
+    type: Schema.Types.ObjectId,
+    ref: "Institution",   
+    required: true
+  },
   message: {
     type: String,
     required: true

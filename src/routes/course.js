@@ -22,4 +22,4 @@ router.put("/institute/course/:id", auth, courseController.updateCourse);
 router.delete("/institute/course/:id", auth, courseController.deleteCourse);
 
 
-module.exports = router;
+module.exports = router; 

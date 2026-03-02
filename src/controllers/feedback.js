@@ -1,15 +1,21 @@
 const Feedback = require("../models/feedback");
 const Course = require("../models/course");
+const mongoose = require("mongoose");
 
-// ================= CREATE FEEDBACK =================
+/* ================= CREATE FEEDBACK ================= */
 exports.createFeedback = async (req, res) => {
-  console.log(req.body);
-   const studentid = req.user.id
-  
   try {
-    const { rating, message, courseid,  } = req.body;
 
-    // check course exists
+    const studentid = req.user.id;
+    const { rating, message, courseid } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(courseid)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course ID"
+      });
+    }
+
     const course = await Course.findById(courseid);
     if (!course) {
       return res.status(404).json({
@@ -21,7 +27,8 @@ exports.createFeedback = async (req, res) => {
     const feedback = await Feedback.create({
       rating,
       message,
-      studentid, // from token
+      studentid,
+      instituteid: course.institution, // ✅ auto set
       courseid: course._id
     });
 
@@ -40,10 +47,15 @@ exports.createFeedback = async (req, res) => {
 };
 
 
-// ================= GET ALL FEEDBACK =================
+/* ================= GET INSTITUTE FEEDBACK ================= */
 exports.getAllFeedback = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find()
+
+    const instituteId = req.user.id; // ✅ from logged-in institute
+
+    const feedbacks = await Feedback.find({
+      instituteid: instituteId
+    })
       .populate("studentid", "email")
       .populate("courseid", "courseName")
       .sort({ submitted_at: -1 });
@@ -63,9 +75,10 @@ exports.getAllFeedback = async (req, res) => {
 };
 
 
-// ================= GET MY FEEDBACK =================
+/* ================= GET STUDENT FEEDBACK ================= */
 exports.getMyFeedback = async (req, res) => {
   try {
+
     const feedback = await Feedback.find({
       studentid: req.user.id
     })

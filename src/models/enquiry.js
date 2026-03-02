@@ -17,17 +17,23 @@ const enquirySchema = new Schema(
 
     courseId: {
       type: Schema.Types.ObjectId,
-      ref: "Course", // make sure this matches your course model name
+      ref: "Course",
       required: true
     },
 
-    name: String,
-    phone: String,
-    qualification: String,
-    description: String,
+    qualification: {
+      type: String,
+      default: ""
+    },
+
+    description: {
+      type: String,
+      default: ""
+    },
 
     status: {
       type: String,
+      enum: ["Pending", "Approved", "Rejected"],
       default: "Pending"
     }
   },

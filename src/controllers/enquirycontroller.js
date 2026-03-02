@@ -1,32 +1,68 @@
 const Enquiry = require("../models/enquiry");
+const Course = require("../models/course");
+const mongoose = require("mongoose");
 
 /* ================= CREATE ENQUIRY ================= */
 
 exports.createEnquiry = async (req, res) => {
   try {
+    const { courseId, qualification, description } = req.body;
 
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Unauthorized" });
+    const course = await Course.findById(courseId);
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
     }
+    console.log(course);
+    
 
-    const enquiry = new Enquiry({
-      studentId: req.user.id,   // ✅ using id (not _id)
-      courseId: req.body.courseId,
-      instituteId: req.body.instituteId,
-      name: req.body.name,
-      phone: req.body.phone,
-      qualification: req.body.qualification,
-      description: req.body.description,
+    const enquiry = await Enquiry.create({
+      studentId: req.user.id,            // logged student
+      courseId: course._id,
+      instituteId: course.institution,   // ✅ always from course
+      qualification,
+      description,
       status: "Pending"
     });
 
-    await enquiry.save();
-
-    res.status(201).json(enquiry);
+    res.status(201).json({
+      success: true,
+      data: enquiry
+    });
 
   } catch (error) {
-    console.error("Create enquiry error:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+/* ================= GET INSTITUTE ENQUIRIES ================= */
+
+exports.getInstituteEnquiries = async (req, res) => {
+  try {
+
+    const instituteId = req.user.id; // ✅ EXACT SAME AS FEEDBACK
+
+    const enquiries = await Enquiry.find({
+      instituteId: instituteId
+    })
+      .populate("studentId", "name email phone")
+      .populate("courseId", "courseName")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: enquiries.length,
+      data: enquiries
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
@@ -36,49 +72,23 @@ exports.createEnquiry = async (req, res) => {
 exports.getStudentEnquiries = async (req, res) => {
   try {
 
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
     const enquiries = await Enquiry.find({
       studentId: req.user.id
     })
-      .populate("courseId")
-      .populate("instituteId");
+      .populate("courseId", "courseName")
+      .populate("instituteId", "institutionName")
+      .sort({ createdAt: -1 });
 
-    res.status(200).json(enquiries);
-
-  } catch (error) {
-    console.error("Student enquiry fetch error:", error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-/* ================= GET INSTITUTE ENQUIRIES ================= */
-
-exports.getInstituteEnquiries = async (req, res) => {
-  try {
-
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    console.log("Logged Institute ID:", req.user.id);
-
-    const enquiries = await Enquiry.find({
-      instituteId: req.user.id
-    })
-      .populate("studentId")
-      .populate("courseId");
-
-    console.log("Found enquiries:", enquiries.length);
-
-    res.status(200).json(enquiries);
+    res.status(200).json({
+      success: true,
+      data: enquiries
+    });
 
   } catch (error) {
-    console.error("Institution enquiry fetch error:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
@@ -88,18 +98,35 @@ exports.getInstituteEnquiries = async (req, res) => {
 exports.updateEnquiryStatus = async (req, res) => {
   try {
 
+    const instituteId = req.user.id;
     const { id } = req.params;
     const { status } = req.body;
 
-    const updated = await Enquiry.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+    const enquiry = await Enquiry.findOne({
+      _id: id,
+      instituteId: instituteId
+    });
 
-    res.status(200).json(updated);
+    if (!enquiry) {
+      return res.status(404).json({
+        success: false,
+        message: "Enquiry not found"
+      });
+    }
+
+    enquiry.status = status;
+    await enquiry.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Status updated successfully",
+      data: enquiry
+    });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
