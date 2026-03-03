@@ -15,12 +15,11 @@ const adminRouter=require("./src/routes/adminRoutes")
 const reviewRouter=require("./src/routes/reviewRoutes")
 const orderRouter=require("./src/routes/oderRoutes")
 const categoryRouter=require("./src/routes/categoryRoutes")
-<<<<<<< HEAD
+
 const enquiryRouter=require("./src/routes/enquiryRoutes")
-=======
+
 const feedbackRoutes = require("./src/routes/feedback");
 
->>>>>>> c851423638bea107e11ff8e465b3f3ba997544c3
 
 const app = express();
 const port = process.env.PORT || 7000;
@@ -45,12 +44,9 @@ app.use("/api",adminRouter);
 app.use("/api",reviewRouter);
 app.use("/api",orderRouter);
 app.use("/api",categoryRouter);
-<<<<<<< HEAD
 app.use("/api",enquiryRouter);
-=======
-app.use("/api/feedback", feedbackRoutes);
 
->>>>>>> c851423638bea107e11ff8e465b3f3ba997544c3
+app.use("/api/feedback", feedbackRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
