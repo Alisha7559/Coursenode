@@ -1,37 +1,34 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
-const feedbackSchema = new Schema({
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5,
-    required: true
+const feedbackSchema = new mongoose.Schema(
+  {
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    studentid: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    instituteid: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Institute",
+      required: true,
+    },
+    courseid: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: true,
+    },
   },
-  studentid: {
-    type: Schema.Types.ObjectId,
-    ref: "Student",   
-    required: true
-  },
-   courseid: {
-    type: Schema.Types.ObjectId,
-    ref: "Course",   
-    required: true
-  },
-  instituteid: {
-    type: Schema.Types.ObjectId,
-    ref: "Institution",   
-    required: true
-  },
-  message: {
-    type: String,
-    required: true
-  },
-  submitted_at: {
-    type: Date,
-    default: Date.now
-  }
-});
+  { timestamps: true }
+);
 
-const Feedback = mongoose.model("Feedback", feedbackSchema);
-module.exports = Feedback;
+module.exports = mongoose.model("Feedback", feedbackSchema);

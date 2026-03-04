@@ -11,5 +11,6 @@ router.get("/feedback", authMiddleware, feedbackController.getAllFeedback);
 
 // Get logged-in student feedback
 router.get("/my", authMiddleware, feedbackController.getMyFeedback);
+router.get("/public-feedback", feedbackController.getPublicFeedback);
 
 module.exports = router;

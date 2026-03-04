@@ -5,7 +5,7 @@ const Student = require("../models/student");
 // ================= REGISTER =================
 exports.registerStudent = async (req, res) => {
   try {
-    const { studentname, email, password } = req.body;
+    const { studentname, email, password, phone } = req.body;
 
     const existingStudent = await Student.findOne({ email });
     if (existingStudent) {
@@ -14,9 +14,10 @@ exports.registerStudent = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const student = await Student.create({
+    await Student.create({
       studentname,
       email,
+      phone,
       password: hashedPassword
     });
 
@@ -29,7 +30,6 @@ exports.registerStudent = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 // ================= LOGIN =================
 exports.loginStudent = async (req, res) => {
   try {

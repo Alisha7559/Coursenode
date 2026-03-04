@@ -1,39 +1,67 @@
 const Enquiry = require("../models/enquiry");
 const Course = require("../models/course");
-const mongoose = require("mongoose");
+const Student = require("../models/student"); 
 
 /* ================= CREATE ENQUIRY ================= */
 
 exports.createEnquiry = async (req, res) => {
   try {
-    const { courseId, qualification, description } = req.body;
+    console.log("createEnquiry API HIT ✅");
 
-    const course = await Course.findById(courseId);
-
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-    console.log(course);
-    
-
-    const enquiry = await Enquiry.create({
-      studentId: req.user.id,            // logged student
-      courseId: course._id,
-      instituteId: course.institution,   // ✅ always from course
+    console.log("Logged user:", req.user);
+    const {
+      courseId,
+      instituteId,
+      name,
+      phone,
       qualification,
       description,
-      status: "Pending"
+    } = req.body;
+
+    if (!courseId || !instituteId || !qualification || !description) {
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be provided",
+      });
+    }
+
+    const student = await Student.findById(req.user.id);
+    
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    const enquiry = await Enquiry.create({
+      courseId,
+      instituteId,
+      studentId: student._id,
+      name: name || student.studentname,
+      phone,
+      email: student.email, // ✅ auto attach email
+      qualification,
+      description,
     });
+
+    await enquiry.populate([
+      { path: "studentId", select: "studentname email" },
+      { path: "courseId", select: "courseName" },
+    ]);
+    
 
     res.status(201).json({
       success: true,
-      data: enquiry
+      message: "Enquiry submitted successfully",
+      data: enquiry,
     });
-
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: "Server error",
     });
   }
 };
@@ -42,13 +70,10 @@ exports.createEnquiry = async (req, res) => {
 
 exports.getInstituteEnquiries = async (req, res) => {
   try {
+    const instituteId = req.user.id;
 
-    const instituteId = req.user.id; // ✅ EXACT SAME AS FEEDBACK
-
-    const enquiries = await Enquiry.find({
-      instituteId: instituteId
-    })
-      .populate("studentId", "name email phone")
+    const enquiries = await Enquiry.find({ instituteId })
+      .populate("studentId", "studentname email phone")  // ✅ FIXED
       .populate("courseId", "courseName")
       .sort({ createdAt: -1 });
 
@@ -59,6 +84,7 @@ exports.getInstituteEnquiries = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Get Institute Enquiry Error:", error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -71,7 +97,6 @@ exports.getInstituteEnquiries = async (req, res) => {
 
 exports.getStudentEnquiries = async (req, res) => {
   try {
-
     const enquiries = await Enquiry.find({
       studentId: req.user.id
     })
@@ -85,6 +110,7 @@ exports.getStudentEnquiries = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Get Student Enquiry Error:", error);
     res.status(500).json({
       success: false,
       message: error.message
@@ -97,14 +123,13 @@ exports.getStudentEnquiries = async (req, res) => {
 
 exports.updateEnquiryStatus = async (req, res) => {
   try {
-
     const instituteId = req.user.id;
     const { id } = req.params;
     const { status } = req.body;
 
     const enquiry = await Enquiry.findOne({
       _id: id,
-      instituteId: instituteId
+      instituteId
     });
 
     if (!enquiry) {
@@ -124,6 +149,7 @@ exports.updateEnquiryStatus = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Update Status Error:", error);
     res.status(500).json({
       success: false,
       message: error.message
