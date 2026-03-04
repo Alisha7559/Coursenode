@@ -15,7 +15,7 @@ router.get("/institute/allcourse", auth, courseController.getAllCourses);
 
 router.get("/institute/course", auth, courseController.getCourseById);
 
-router.get("/course/:id", auth,courseController. getSingleCourseById);
+router.get("/course/:id",courseController. getSingleCourseById);
 
 router.put(
   "/update/:id",
@@ -26,4 +26,4 @@ router.put(
 router.delete("/institute/course/:id", auth, courseController.deleteCourse);
 
 
-module.exports = router;
+module.exports = router; 

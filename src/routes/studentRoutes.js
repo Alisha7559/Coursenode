@@ -1,36 +1,27 @@
-const express=require("express")
-const router=express.Router();
-const studentcontroller=require("../controllers/studentcontroller")
+const express = require("express");
+const router = express.Router();
+const studentcontroller = require("../controllers/studentcontroller");
+const auth = require("../middleware/auth")
+// REGISTER
+router.post("/register", studentcontroller.registerStudent);
 
-// =================================
-//          register STUDENT
-// =================================
+// LOGIN
+router.post("/login", studentcontroller.loginStudent);
+// Profile
+router.get("/profile", auth, studentcontroller.getProfile);
+// LOGOUT
+router.post("/logout", studentcontroller.logoutStudent);
 
-router.post("/student/register", studentcontroller.registerStudent);
+// GET ALL
+router.get("/", studentcontroller.getAllStudents);
 
+// GET ONE
+router.get("/:id", studentcontroller.findStudent);
 
-// =================================
-//          READ STUDENT
-// =================================
-router.get('/getstudent/:id',studentcontroller.findStudent)
-router.get("/getallstudents",studentcontroller.getAllStudents);
+// UPDATE
+router.put("/:id", studentcontroller.updateStudent);
 
+// DELETE
+router.delete("/:id", studentcontroller.deleteStudent);
 
-
-
-// =================================
-//         UPDATE STUDENT
-// =================================
-router.put('/updatestudent/:id',studentcontroller.updateStudent)
-
-
-// =================================
-//          DELETE STUDENT
-// =================================
-router.delete('/deletestudent/:id',studentcontroller.deleteStudent)
-
-// =================================
-//          LOGIN STUDENT
-// =================================
-router.post("/student/login", studentcontroller.loginStudent);
-module.exports =router
+module.exports = router;

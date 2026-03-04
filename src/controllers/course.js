@@ -9,7 +9,7 @@ exports.createCourse = async (req, res) => {
   try {
     const { courseName, category, subcategory, fees, totalSeats, mode, status,duration,Skills , location, description } = req.body;
 
-    // const images = req.files ? req.files.map(f => f.filename) : [];
+    
     const images = req.files ? req.files.map(f => `uploads/${f.filename}`) : [];
 
 const modules = req.body.modules
@@ -242,4 +242,5 @@ exports.deleteCourse = async (req, res) => {
       error: error.message
     });
   }
-};
+}; 
+

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const courseSchema = new Schema({
-  // courseid :{
+  // couseid :{
   //   type: String,
   //   required: true,
   //   trim: true

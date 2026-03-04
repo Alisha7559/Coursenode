@@ -1,126 +1,202 @@
+// const bcrypt = require("bcrypt");
+// const jwt = require("jsonwebtoken");
+// const Student = require("../models/student");
 
-const bcrypt = require("bcrypt")
+// // ================= REGISTER =================
+// exports.registerStudent = async (req, res) => {
+//   try {
+//     const { studentname, email, password } = req.body;
+
+//     const existingStudent = await Student.findOne({ email });
+//     if (existingStudent) {
+//       return res.status(400).json({ message: "Email already registered" });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const student = await Student.create({
+//       studentname,
+//       email,
+//       password: hashedPassword
+//     });
+
+//     res.status(201).json({
+//       success: true,
+//       message: "Student registered successfully"
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // ================= LOGIN =================
+// exports.loginStudent = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const student = await Student.findOne({ email });
+//     if (!student) {
+//       return res.status(404).json({ message: "Invalid email or password" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, student.password);
+//     if (!isMatch) {
+//       return res.status(401).json({ message: "Invalid email or password" });
+//     }
+
+//     const token = jwt.sign(
+//       { id: student._id },
+//       process.env.JWT_SECRET || "INS123",
+//       { expiresIn: "1h" }
+//     );
+
+//    res.cookie("token", token, {
+//   httpOnly: true,
+//   secure: false, // true in production (HTTPS)
+//   sameSite: "lax",
+// });
+
+//     res.json({
+//   success: true,
+//   message: "Login successful",
+//   student: {
+//     id: student._id,
+//     name: student.name,
+//     email: student.email,
+//     institutionName: student.institutionName,
+//     institutionEmail: student.institutionEmail
+//   }
+// });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // ================= LOGOUT =================
+// exports.logoutStudent = (req, res) => {
+//   res.clearCookie("token");
+//   res.status(200).json({
+//     success: true,
+//     message: "Logged out successfully"
+//   });
+// };
+
+// // ================= GET ONE =================
+// exports.findStudent = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const student = await Student.findById(id).select("-password");
+
+//     if (!student) {
+//       return res.status(404).json({ message: "Student not found" });
+//     }
+
+//     res.status(200).json(student);
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // ================= GET ALL =================
+// exports.getAllStudents = async (req, res) => {
+//   try {
+//     const students = await Student.find().select("-password");
+
+//     res.status(200).json({
+//       success: true,
+//       count: students.length,
+//       data: students
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // ================= UPDATE =================
+// exports.updateStudent = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const updatedStudent = await Student.findByIdAndUpdate(
+//       id,
+//       req.body,
+//       { new: true, runValidators: true }
+//     ).select("-password");
+
+//     if (!updatedStudent) {
+//       return res.status(404).json({ message: "Student not found" });
+//     }
+
+//     res.status(200).json({
+//       message: "Student updated successfully",
+//       data: updatedStudent
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// // ================= DELETE =================
+// exports.deleteStudent = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const deletedStudent = await Student.findByIdAndDelete(id);
+
+//     if (!deletedStudent) {
+//       return res.status(404).json({ message: "Student not found" });
+//     }
+
+//     res.status(200).json({
+//       message: "Student deleted successfully"
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Student = require("../models/student")
+const Student = require("../models/student");
+
 
 // ================= REGISTER =================
 exports.registerStudent = async (req, res) => {
-  console.log(req.body)
   try {
-    const { studentname, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    // check if student already exists
     const existingStudent = await Student.findOne({ email });
     if (existingStudent) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const student = new Student({
-      studentname,
+    const student = await Student.create({
+      studentname : name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      
     });
 
-    await student.save();
-
-    res.status(201).json({ message: "Student registered successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-// =========gethandlers=============
-exports.findStudent = async (req, res) => {
-  try {
-    const { id } = req.body;
-
-    if (!id) {
-      return res.status(400).json({ message: "Student ID is required" });
-    }
-
-    const student = await Student.findById(id);
-
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    res.status(200).json(student);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-// ============ getall students===========
-exports.getAllStudents = async (req, res) => {
-  try {
-    const student = await Student.find(); 
-   
-
-    res.status(200).json({
+    res.status(201).json({
       success: true,
-      count: student.length,
-      data: student
+      message: "Student registered successfully",
+      student: {
+        id: student._id,
+        studentname: student.studentname,
+        email: student.email,
+        
+      
+      }
     });
 
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-
-
-//======== update handler===============
-exports.updateStudent = async (req, res) => {
-  try {
-    const { id, ...updateData } = req.body;
-
-    if (!id) {
-      return res.status(400).json({ message: "Student ID is required" });
-    }
-
-    const updatedStudent = await Student.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedStudent) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    res.status(200).json({
-      message: "Student updated successfully",
-      data: updatedStudent
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
-
-
-
-// ===========delete handler=================
-exports.deleteStudent = async (req, res) => {
-  try {
-    const { id } = req.body;
-
-    if (!id) {
-      return res.status(400).json({ message: "Student ID is required" });
-    }
-
-    const deletedStudent = await Student.findByIdAndDelete(id);
-
-    if (!deletedStudent) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    res.status(200).json({ message: "Student deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -133,36 +209,162 @@ exports.loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // check student
     const student = await Student.findOne({ email });
     if (!student) {
       return res.status(404).json({ message: "Invalid email or password" });
     }
 
-    // compare password
     const isMatch = await bcrypt.compare(password, student.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // create token
     const token = jwt.sign(
       { id: student._id },
-      process.env.JWT_SECRET || "secretkey",
+      process.env.JWT_SECRET || "INS123",
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // true in production (HTTPS)
+      sameSite: "lax",
+    });
+
+    res.json({
+      success: true,
       message: "Login successful",
-      token,
       student: {
         id: student._id,
         studentname: student.studentname,
-        email: student.email
+        email: student.email,
+        institutionName: student.institutionName,
+        institutionEmail: student.institutionEmail
       }
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
+
+// ================= LOGOUT =================
+exports.logoutStudent = (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully"
+  });
+};
+
+
+
+// ================= PROFILE (VERY IMPORTANT) =================
+// This is required for CourseDetail login check
+exports.getProfile = async (req, res) => {
+  try {
+    const student = await Student.findById(req.user.id).select("-password");
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      student
+
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+// ================= GET ONE =================
+exports.findStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const student = await Student.findById(id).select("-password");
+
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json(student);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+// ================= GET ALL =================
+exports.getAllStudents = async (req, res) => {
+  try {
+    const students = await Student.find().select("-password");
+
+    res.status(200).json({
+      success: true,
+      count: students.length,
+      data: students
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+// ================= UPDATE =================
+exports.updateStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedStudent = await Student.findByIdAndUpdate(
+      id,
+      req.body,
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedStudent) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json({
+      message: "Student updated successfully",
+      data: updatedStudent
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+// ================= DELETE =================
+exports.deleteStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedStudent = await Student.findByIdAndDelete(id);
+
+    if (!deletedStudent) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json({
+      message: "Student deleted successfully"
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

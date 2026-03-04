@@ -1,35 +1,43 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const enquirySchema = new mongoose.Schema({
-  studentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Student"
+const enquirySchema = new Schema(
+  {
+    studentId: {
+      type: Schema.Types.ObjectId,
+      ref: "Student",
+      required: true
+    },
+
+    instituteId: {
+      type: Schema.Types.ObjectId,
+      ref: "Institution",
+      required: true
+    },
+
+    courseId: {
+      type: Schema.Types.ObjectId,
+      ref: "Course",
+      required: true
+    },
+
+    qualification: {
+      type: String,
+      default: ""
+    },
+
+    description: {
+      type: String,
+      default: ""
+    },
+
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Rejected"],
+      default: "Pending"
+    }
   },
-  courseId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Course"
-  },
-  instituteId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Institute"
-  },
-  status: {
-    type: String,
-    default: "Pending"
-  },
-    name: {type:String},
+  { timestamps: true }
+);
 
-  phone:  {type:String},
-
-  qualification: {type:String},
-
-  description:  {type:String},
-
-  status: {
-    type: String,
-    default: "Pending"
-  }
-}, { timestamps: true });
-
-const Enquiry = mongoose.model("Enquiry", enquirySchema);
-module.exports = Enquiry;
+module.exports = mongoose.model("Enquiry", enquirySchema);

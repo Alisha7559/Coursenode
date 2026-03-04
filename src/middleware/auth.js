@@ -1,23 +1,24 @@
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
+require("dotenv").config();
 
 module.exports = (req, res, next) => {
-  
-  
   try {
     const token = req.cookies.token;
 
-    
     if (!token) {
-      return res.status(401).send("Access denied. No token provided");
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-  req.user = { id: decoded.id, role: decoded.role };
+    // Your token contains { id }
+    req.user = {
+      id: decoded.id
+    };
 
     next();
+
   } catch (error) {
-    res.status(401).send("Invalid or expired token");
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

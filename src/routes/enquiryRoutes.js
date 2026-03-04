@@ -1,11 +1,18 @@
-const express=require("express")
-const router=express.Router();
-const enquirycontroller=require("../controllers/enquirycontroller")
+const express = require("express");
+const router = express.Router();
 const auth = require("../middleware/auth");
+const enquiryController = require("../controllers/enquirycontroller");
 
+// Create enquiry
+router.post("/", auth, enquiryController.createEnquiry);
 
+// Student enquiries
+router.get("/student", auth, enquiryController.getStudentEnquiries);
 
-router.post("/enquiry", auth,enquirycontroller.createEnquiry);
+// Institute enquiries
+router.get("/institute", auth, enquiryController.getInstituteEnquiries);
 
-router.get("/getenquiry/:instituteId", auth, enquirycontroller.getInstituteEnquiries);
-module.exports =router
+// Update status
+router.put("/:id", auth, enquiryController.updateEnquiryStatus);
+
+module.exports = router;
