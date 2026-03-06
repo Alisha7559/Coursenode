@@ -31,7 +31,7 @@ const courseSchema = new Schema({
     enum: ["Beginner", "Intermediate", "Advanced"]
   },
 location:{type:String},
-  Skills: [{ type: String }],
+  skills: [String ],
 
  status: {
     type: String,
@@ -71,6 +71,9 @@ fees: {
   },
 subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", required: true },
 
+description: {
+  type: String
+},
 //   ratingAverage: {
 //     type: Number,
 //     default: 0

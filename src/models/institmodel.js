@@ -35,8 +35,8 @@ const institutionSchema = new Schema(
     institutionType: { type: String },
     yearEstablished: { type: String },
     registrationNumber: { type: String },
-    // accreditationAuthority: { type: String },
-    // gstNumber: { type: String },
+    accreditationAuthority: { type: String },
+    gstNumber: { type: String },
 
     // Contact
     officialEmail: { type: String },
