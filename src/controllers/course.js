@@ -7,11 +7,15 @@ exports.createCourse = async (req, res) => {
 
   console.log("FILES:", req.files);
   try {
-    const { courseName, category, subcategory, fees, totalSeats, mode, status,duration,Skills , location, description } = req.body;
+    const { courseName, category, subcategory, fees, totalSeats, mode, status,duration, location, description } = req.body;
 
     
     const images = req.files ? req.files.map(f => `uploads/${f.filename}`) : [];
+let skills = [];
 
+if (req.body.skills) {
+  skills = JSON.parse(req.body.skills);
+}
 const modules = req.body.modules
   ? JSON.parse(req.body.modules)
   : [];
@@ -26,7 +30,7 @@ const course = await Course.create({
   mode,
   status,
   duration,
-  Skills,
+ skills,
   location,
   description,
   images,
@@ -149,7 +153,7 @@ exports.updateCourse = async (req, res) => {
       fees,
       totalSeats,
       mode,
-      Skills,
+     
       duration,
       status,
       
@@ -178,7 +182,11 @@ exports.updateCourse = async (req, res) => {
         oldImages = [existingImages];
       }
     }
+ let skills = [];
 
+if (req.body.skills) {
+  skills = JSON.parse(req.body.skills);
+}
     const updatedCourse = await Course.findByIdAndUpdate(
       courseId,
       {
@@ -189,7 +197,7 @@ exports.updateCourse = async (req, res) => {
         totalSeats,
         mode,
         status,
-      
+       skills,duration,
         location,
         description,
         modules,
