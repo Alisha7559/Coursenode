@@ -155,4 +155,36 @@ exports.updateEnquiryStatus = async (req, res) => {
       message: error.message
     });
   }
+}; 
+/* ================= DELETE ENQUIRY ================= */
+
+exports.deleteEnquiry = async (req, res) => {
+  try {
+    const instituteId = req.user.id;
+    const { id } = req.params;
+
+    const enquiry = await Enquiry.findOneAndDelete({
+      _id: id,
+      instituteId
+    });
+
+    if (!enquiry) {
+      return res.status(404).json({
+        success: false,
+        message: "Enquiry not found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Enquiry deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("Delete Enquiry Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 };

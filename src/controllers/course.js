@@ -7,9 +7,9 @@ exports.createCourse = async (req, res) => {
 
   console.log("FILES:", req.files);
   try {
-    const { courseName, category, subcategory, fees, totalSeats, mode, status, approval, location, description } = req.body;
+    const { courseName, category, subcategory, fees, totalSeats, mode, status,duration,Skills , location, description } = req.body;
 
-    // const images = req.files ? req.files.map(f => f.filename) : [];
+    
     const images = req.files ? req.files.map(f => `uploads/${f.filename}`) : [];
 
 const modules = req.body.modules
@@ -25,7 +25,8 @@ const course = await Course.create({
   totalSeats,
   mode,
   status,
-  approval,
+  duration,
+  Skills,
   location,
   description,
   images,
@@ -137,26 +138,82 @@ exports.getSingleCourseById = async (req, res) => {
 
 };
 
-/* UPDATE COURSE */
 exports.updateCourse = async (req, res) => {
-  console.log(req.body);
   try {
-    _id = req.params.id
-    const course = await Course.findByIdAndUpdate(
+    const courseId = req.params.id;
 
-      _id,
-      req.body,
+    const {
+      courseName,
+      category,
+      subcategory,
+      fees,
+      totalSeats,
+      mode,
+      Skills,
+      duration,
+      status,
+      
+      location,
+      description,
+      existingImages
+    } = req.body;
+
+    // Parse modules safely
+    const modules = req.body.modules
+      ? JSON.parse(req.body.modules)
+      : [];
+
+    // New uploaded images
+    const newImages = req.files
+      ? req.files.map(f => `uploads/${f.filename}`)
+      : [];
+
+    // Existing images (if editing)
+    let oldImages = [];
+
+    if (existingImages) {
+      if (Array.isArray(existingImages)) {
+        oldImages = existingImages;
+      } else {
+        oldImages = [existingImages];
+      }
+    }
+
+    const updatedCourse = await Course.findByIdAndUpdate(
+      courseId,
+      {
+        courseName,
+        category,
+        subcategory,
+        fees,
+        totalSeats,
+        mode,
+        status,
+      
+        location,
+        description,
+        modules,
+        images: [...oldImages, ...newImages]
+      },
       { new: true }
-    );
+    )
+      .populate("category", "name")
+      .populate("subcategory", "name")
+      .populate("institution", "name email description");
 
-    if (!course)
-      return res.status(404).json({ success: false, message: "Course not found" });
+    if (!updatedCourse) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found"
+      });
+    }
 
     res.status(200).json({
       success: true,
       message: "Course updated successfully",
-      data: course
+      data: updatedCourse
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -186,203 +243,4 @@ exports.deleteCourse = async (req, res) => {
     });
   }
 }; 
-
-// /* CREATE COURSE */
-// exports.createCourse = async (req, res) => {
-//   try {
-//     const {
-//       courseName,
-//       category,
-//       subcategory,
-//       fees,
-//       totalSeats,
-//       mode,
-//       status,
-//       location,
-//       description
-//     } = req.body;
-
-//     const images = req.files
-//       ? req.files.map(f => `uploads/${f.filename}`)
-//       : [];
-
-//     const modules = req.body.modules
-//       ? JSON.parse(req.body.modules)
-//       : [];
-
-//     const course = await Course.create({
-//       courseName,
-//       category,
-//       subcategory,
-//       institution: req.user.id,
-//       fees,
-//       totalSeats,
-//       mode,
-//       status,
-//       location,
-//       description,
-//       images,
-//       modules
-//     });
-
-//     const populatedCourse = await Course.findById(course._id)
-//       .populate("category", "name")
-//       .populate("subcategory", "name")
-//       .populate("institution", "name email description");
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Course added successfully",
-//       data: populatedCourse
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-
-// /* GET all COURSE */
-// exports.getAllCourses = async (req, res) => {
-//   try {
-
-//     const courses = await Course.find()
-//       .populate("category", "name")
-//       .populate("subcategory", "name")
-//       .populate("institution", "name email description");
-
-//     res.status(200).json({
-//       success: true,
-//       data: courses
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-// // get a single course
-// exports.getSingleCourseById = async (req, res) => {
-//   try {
-
-//     const { id } = req.params;
-
-//     if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid course ID"
-//       });
-//     }
-
-//     const course = await Course.findById(id)
-//       .populate("category", "name")
-//       .populate("subcategory", "name")
-//       .populate("institution", "name email description");
-
-//     if (!course) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Course not found"
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       data: course
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-// /* UPDATE COURSE */
-// exports.updateCourse = async (req, res) => {
-//   try {
-
-//     const { id } = req.params;
-
-//     const updated = await Course.findByIdAndUpdate(
-//       id,
-//       req.body,
-//       { new: true }
-//     )
-//       .populate("category", "name")
-//       .populate("subcategory", "name")
-//       .populate("institution", "name email description");
-
-//     if (!updated) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Course not found"
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Course updated successfully",
-//       data: updated
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-
-// /* DELETE COURSE */
-// exports.deleteCourse = async (req, res) => {
-//   try {
-
-//     const deleted = await Course.findByIdAndDelete(req.params.id);
-
-//     if (!deleted) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Course not found"
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Course deleted successfully"
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
-// exports.getCourseByInstitute = async (req, res) => {
-//   try {
-
-//     const courses = await Course.find({
-//       institution: req.user.id
-//     })
-//       .populate("category", "name")
-//       .populate("subcategory", "name")
-//       .populate("institution", "name email description");
-
-//     res.json({
-//       success: true,
-//       data: courses
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message
-//     });
-//   }
-// };
 

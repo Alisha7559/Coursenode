@@ -26,12 +26,12 @@ const courseSchema = new Schema({
     required: true
   },
 
-//   difficultyLevel: {
-//     type: String,
-//     enum: ["Beginner", "Intermediate", "Advanced"]
-//   },
-
-//   skillsCovered: [{ type: String }],
+  Level: {
+    type: String,
+    enum: ["Beginner", "Intermediate", "Advanced"]
+  },
+location:{type:String},
+  Skills: [{ type: String }],
 
  status: {
     type: String,
@@ -60,10 +60,10 @@ const courseSchema = new Schema({
    }
  ],
 
-//   duration: {
-//     type: Number,
-//     required: true
-//   },
+  duration: {
+    type: Number,
+    required: true
+  },
 
 fees: {
     type: Number,
@@ -112,19 +112,19 @@ subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", r
     }
   ],
 
-//   thumbnail: {
-//     type: String
-//   },
+  thumbnail: {
+    type: String
+  },
 
-//   isActive: {
-//     type: Boolean,
-//     default: true
-//   },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
 
-//   createdAt: {
-//     type: Date,
-//     default: Date.now
-//   }
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const Course = mongoose.model("Course", courseSchema);

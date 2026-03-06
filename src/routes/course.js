@@ -15,10 +15,14 @@ router.get("/institute/allcourse", auth, courseController.getAllCourses);
 
 router.get("/institute/course", auth, courseController.getCourseById);
 
-router.get("/course/:id", auth,courseController. getSingleCourseById);
+router.get("/course/:id",courseController. getSingleCourseById);
 
-router.put("/institute/course/:id", auth, courseController.updateCourse);
-
+router.put(
+  "/update/:id",
+  auth,
+  upload.array("images"),
+  courseController.updateCourse
+);
 router.delete("/institute/course/:id", auth, courseController.deleteCourse);
 
 

@@ -49,17 +49,20 @@ exports.loginInsti = async (req, res) => {
       process.env.SECRET_KEY,
       { expiresIn: "1d" }
     );
-    
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
-
-    res.status(200).json({ message: "Login successful", token,institution: {
+    res.status(200).json({
+      message: "Login successful", token, institution: {
         id: institution._id,
         name: institution.name,
-        email: institution.email
-      }});
+        email: institution.email,
+        isProfileCompleted: institution.isProfileCompleted
+      }
+    });
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -93,7 +96,7 @@ exports.getInstiById = async (req, res) => {
 exports.getInstiFromToken = async (req, res) => {
   try {
     const insti_id = req.user; // set by auth middleware
-    
+
     const institution = await Institution
       .findById(insti_id.id)
       .select("-password");
@@ -111,38 +114,85 @@ exports.getInstiFromToken = async (req, res) => {
 /* ========= UPDATE LOGGED-IN INSTITUTION ========= */
 exports.updateInsti = async (req, res) => {
   try {
-    const token = req.cookies.insti_token;
-    
+    const insti_id = req.user.id;
 
-    if (!token) return res.status(401).send("No token found");
+    console.log("BODY:", req.body);
+    console.log("FILES:", req.files);
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const institution = await Institution.findById(insti_id);
 
-    const updatedInsti = await Institution.findByIdAndUpdate(
-      decoded.id,
-      req.body,
-      { new: true }
-    ).select("-password");
+    if (!institution) return res.status(404).send("Institution not found");
 
-    if (!updatedInsti) return res.status(404).send("Institution not found");
+    // ===== Profile Image =====
+    if (req.files?.profileImage && req.files.profileImage.length > 0) {
+      institution.profileImage = req.files.profileImage[0].filename;
+    }
+    if (req.body.removedProfileImage === "true" || req.body.removedProfileImage === true) {
+      institution.profileImage = null;
+    }
 
-    res.status(200).json(updatedInsti);
+    // ===== Certificates =====
+    // Start with existing
+    let existingCerts = institution.certificate || [];
+
+    // Remove deleted certificates if any
+    const removedCertificates = req.body.removedCertificates || [];
+    const removedArray = Array.isArray(removedCertificates) ? removedCertificates : [removedCertificates];
+    existingCerts = existingCerts.filter(file => !removedArray.includes(file));
+
+    // Add newly uploaded certificates
+    if (req.files?.certificate && req.files.certificate.length > 0) {
+      const newCerts = req.files.certificate.map(f => f.filename);
+      existingCerts = [...existingCerts, ...newCerts];
+    }
+
+    institution.certificate = existingCerts;
+
+    // ===== Other fields =====
+    const allowedFields = [
+      "institutionName",
+      "institutionType",
+      "yearEstablished",
+      "registrationNumber",
+      // "accreditationAuthority",
+      // "gstNumber",
+      "officialEmail",
+      "officialPhone",
+      "website",
+      "address",
+      "city",
+      "state",
+      "country",
+      "postalCode",
+      "description"
+    ];
+
+    allowedFields.forEach(f => {
+      if (req.body[f] !== undefined) institution[f] = req.body[f];
+    });
+
+    institution.isProfileCompleted = true;
+
+    await institution.save();
+
+    res.status(200).json({ success: true, data: institution });
+
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };
-
-/* ========= DELETE LOGGED-IN INSTITUTION ===
-====== */
+/* ========= DELETE LOGGED-IN INSTITUTION ========= */
 exports.deleteInsti = async (req, res) => {
   try {
-    const token = req.cookies.insti_token;
-    if (!token) return res.status(401).send("No token found");
+    const insti_id = req.user.id;
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const deletedInsti = await Institution.findByIdAndDelete(insti_id);
 
-    const deletedInsti = await Institution.findByIdAndDelete(decoded.id);
-    if (!deletedInsti) return res.status(404).send("Institution not found");
+    if (!deletedInsti)
+      return res.status(404).send("Institution not found");
+
+    res.clearCookie("token");
 
     res.status(200).send("Institution deleted successfully");
   } catch (error) {

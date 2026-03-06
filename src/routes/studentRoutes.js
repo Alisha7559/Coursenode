@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const studentcontroller = require("../controllers/studentcontroller");
-
+const auth = require("../middleware/auth")
 // REGISTER
 router.post("/register", studentcontroller.registerStudent);
 
 // LOGIN
 router.post("/login", studentcontroller.loginStudent);
-
+// Profile
+router.get("/profile", auth, studentcontroller.getProfile);
 // LOGOUT
 router.post("/logout", studentcontroller.logoutStudent);
 
