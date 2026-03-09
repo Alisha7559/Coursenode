@@ -80,19 +80,24 @@ exports.getCourseById = async (req, res) => {
   }
 };
 
-/* GET all COURSE */
 exports.getAllCourses = async (req, res) => {
   try {
     const course = await Course.find()
       .populate("category", "name")
+      .populate("subcategory", "name")   // ⭐ ADD THIS
       .populate("institution", "name email description");
 
-
-
     if (!course)
-      return res.status(404).json({ success: false, message: "Course not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Course not found"
+      });
 
-    res.status(200).json({ success: true, data: course });
+    res.status(200).json({
+      success: true,
+      data: course
+    });
+
   } catch (error) {
     res.status(500).json({
       success: false,
