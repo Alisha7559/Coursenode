@@ -7,7 +7,7 @@ const upload = require("../middleware/upload");
 
 /* ========= AUTH ROUTES ========= */
 router.post("/register", instiController.registerInsti);
-router.post("/login", instiController.loginInsti);
+router.post("/institution/login", instiController.loginInsti);
 
 /* ========= READ ROUTES ========= */
 router.get("/allinsti", instiController.getAllInsti);              // get all institutions

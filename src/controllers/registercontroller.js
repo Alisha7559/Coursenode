@@ -32,21 +32,25 @@ exports.registerCourse = async (req, res) => {
       });
     }
 
-    if (course.totalSeats <= 0) {
-      return res.status(400).json({
-        message: "No seats available",
-      });
-    }
+    if (!course.enrolledStudents) {
+  course.enrolledStudents = [];
+}
 
-    const newRegistration = await Register.create({
-      studentId,
-      courseId,
-      paymentMethod,
-      status: "Pending",
-    });
+if (course.enrolledStudents.length >= course.totalSeats) {
+  return res.status(400).json({
+    message: "No seats available",
+  });
+}
 
-    course.totalSeats -= 1;
-    await course.save();
+const newRegistration = await Register.create({
+  studentId,
+  courseId,
+  paymentMethod,
+  status: "Pending",
+});
+
+course.enrolledStudents.push(studentId);
+await course.save();
 
     const populatedRegistration = await Register.findById(
       newRegistration._id
@@ -73,7 +77,14 @@ exports.getRegisteredStudents = async (req, res) => {
 
     const registrations = await Register.find()
       .populate("studentId", "studentname email")
-      .populate("courseId", "courseName");
+     .populate({
+  path: "courseId",
+  select: "courseName subcategory",
+  populate: {
+    path: "subcategory",
+    select: "name"
+  }
+})
 
     res.json(registrations);
 
@@ -88,28 +99,22 @@ exports.getInstitutionStudents = async (req, res) => {
   try {
 
     const institutionId = req.user.id;
+    console.log("Institution ID:", institutionId);
 
-    const courses = await Course.find({ institution: institutionId }).select("_id");
+    const courses = await Course.find({ institution: institutionId });
+    console.log("Courses Found:", courses);
 
     const courseIds = courses.map(c => c._id);
 
     const registrations = await Register.find({
       courseId: { $in: courseIds }
-    })
-      .populate("studentId", "studentname email")
-      .populate({
-        path: "courseId",
-        select: "courseName subcategory",
-        populate: {
-          path: "subcategory",
-          select: "name"
-        }
-      });
+    });
+
+    console.log("Registrations:", registrations);
 
     res.json(registrations);
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
   }
 };
