@@ -61,7 +61,7 @@ location:{type:String},
  ],
 
   duration: {
-    type: Number,
+    type: String,
     required: true
   },
 

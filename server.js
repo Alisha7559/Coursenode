@@ -18,6 +18,8 @@ const categoryRouter = require("./src/routes/categoryRoutes");
 const enquiryRouter = require("./src/routes/enquiryRoutes");
 const feedbackRoutes = require("./src/routes/feedback");
 const registerRoutes = require("./src/routes/registerRoutes");
+const institutionMail = require("./src/routes/nodemailerRoutes"); 
+
 const app = express();
 const port = process.env.PORT || 7000;
 
@@ -25,6 +27,7 @@ app.use(cors({
   origin: ["http://localhost:3000", "http://localhost:3001"],
   credentials: true
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -44,6 +47,8 @@ app.use("/api", categoryRouter);
 app.use("/api/enquiry", enquiryRouter);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api", registerRoutes);
+app.use("/api", institutionMail);
+
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });

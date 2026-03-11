@@ -53,7 +53,8 @@ exports.loginInsti = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
+      
     });
     res.status(200).json({
       message: "Login successful", token, institution: {
@@ -147,6 +148,7 @@ exports.updateInsti = async (req, res) => {
     }
 
     institution.certificate = existingCerts;
+    
 
     // ===== Other fields =====
     const allowedFields = [
@@ -197,5 +199,39 @@ exports.deleteInsti = async (req, res) => {
     res.status(200).send("Institution deleted successfully");
   } catch (error) {
     res.status(500).send(error.message);
+  }
+};
+/* ========= CHANGE PASSWORD ========= */
+exports.changePassword = async (req, res) => {
+  console.log("REQ.USER:", req.user);
+  console.log("BODY:", req.body);
+
+  try {
+    const insti_id = req.user.id;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "Both passwords required" });
+    }
+
+    const institution = await Institution.findById(insti_id);
+    if (!institution) {
+      return res.status(404).json({ message: "Institution not found" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, institution.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password incorrect" });
+    }
+
+    institution.password = await bcrypt.hash(newPassword, 10);
+
+    // save without validating other fields
+    await institution.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ message: error.message });
   }
 };

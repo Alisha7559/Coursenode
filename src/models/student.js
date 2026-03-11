@@ -1,29 +1,26 @@
-const mongoose = require("mongoose")
-const { Schema } = mongoose
-const studentSchema = new Schema({
-    // studentid: { type: String },
-    studentname: { type: String },
-    email: { type: String },
-    password: { type: String },
-    // phone: { type: String },
-    // education: {
+const mongoose = require("mongoose");
 
-    //     education_board_X: { type: String },
-    //     marklist: { type: Number },
-    //     education_board_XII: { type: String },
-    //     marklist: { type: Number }
-    // },
-    // fees registration:{type:String},
-    // gender: { type: String },
-    // skills: { type: [String] },
-    // careergoal: { type: String },
-    // interest: { type: [String] },
-    // createdat: { type: String },
-    // lastlogin: { type: String }
+const studentSchema = new mongoose.Schema(
+  {
+    studentname: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    phone: {
+      type: String,
+      default: ""
+    },
+    password: {
+      type: String,
+      required: true
+    }
+  },
+  { timestamps: true }
+);
 
-
-
-
-})
-const Student = mongoose.model("Student", studentSchema)
-module.exports = Student
+module.exports = mongoose.model("Student", studentSchema);

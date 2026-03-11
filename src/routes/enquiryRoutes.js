@@ -15,4 +15,6 @@ router.get("/institute", auth, enquiryController.getInstituteEnquiries);
 // Update status
 router.put("/:id", auth, enquiryController.updateEnquiryStatus);
 
+// Delete enquiry
+router.delete("/:id", auth, enquiryController.deleteEnquiry);
 module.exports = router;

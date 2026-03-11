@@ -24,6 +24,7 @@ router.put(
   ]),
   instiController.updateInsti
 );  // update logged-in institution
-router.delete("/delete", auth, instiController.deleteInsti);      // delete logged-in institution
-
+router.delete("/delete", auth, instiController.deleteInsti);
+      // delete logged-in institution
+router.put("/change-password",  auth, instiController.changePassword);
 module.exports = router;

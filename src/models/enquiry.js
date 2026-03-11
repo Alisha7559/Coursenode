@@ -1,41 +1,47 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
-const enquirySchema = new Schema(
+const enquirySchema = new mongoose.Schema(
   {
-    studentId: {
-      type: Schema.Types.ObjectId,
-      ref: "Student",
-      required: true
-    },
-
-    instituteId: {
-      type: Schema.Types.ObjectId,
-      ref: "Institution",
-      required: true
-    },
-
     courseId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
-      required: true
+      required: true,
     },
-
+    instituteId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Institute",
+      required: true,
+    },
+    studentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
     qualification: {
       type: String,
-      default: ""
+      required: true,
     },
-
     description: {
       type: String,
-      default: ""
+      required: true,
     },
-
     status: {
       type: String,
-      enum: ["Pending", "Approved", "Rejected"],
-      default: "Pending"
-    }
+      enum: ["Pending", "Contacted", "Resolved"],
+      default: "Pending",
+    },
   },
   { timestamps: true }
 );

@@ -98,23 +98,41 @@ exports.getRegisteredStudents = async (req, res) => {
 exports.getInstitutionStudents = async (req, res) => {
   try {
 
-    const institutionId = req.user.id;
+    // ✅ ADD THIS LINE HERE
+    console.log("Logged Institution:", req.user);
+
+    const institutionId = req.user.id; // logged-in institution
     console.log("Institution ID:", institutionId);
 
-    const courses = await Course.find({ institution: institutionId });
-    console.log("Courses Found:", courses);
+    // 1️⃣ Get all courses of this institution
+    const courses = await Course.find({ institution: institutionId }).select("_id");
+
+    console.log("Courses found:", courses); // optional debug
+
+    if (!courses.length) {
+      return res.json([]); // No courses → no students
+    }
 
     const courseIds = courses.map(c => c._id);
 
-    const registrations = await Register.find({
-      courseId: { $in: courseIds }
-    });
+    // 2️⃣ Find registrations
+    const registrations = await Register.find({ courseId: { $in: courseIds } })
+      .populate("studentId", "studentname email")
+      .populate({
+        path: "courseId",
+        select: "courseName subcategory",
+        populate: { path: "subcategory", select: "name" }
+      });
 
-    console.log("Registrations:", registrations);
+    console.log("Registrations:", registrations); // optional debug
 
-    res.json(registrations);
+    res.status(200).json(registrations);
 
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching institution students:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message
+    });
   }
 };
