@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 /* ========= REGISTER ========= */
 exports.registerInsti = async (req, res) => {
   try {
-    const { name, email, password, description } = req.body;
+    const { name, email, password, phone, city, description } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).send("All fields required");
@@ -20,12 +20,18 @@ exports.registerInsti = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      phone,
+      city,
       description
     });
 
     await institution.save();
 
-    res.status(201).json({ message: "Institution registered successfully" });
+    res.status(201).json({
+      message: "Institution registered successfully",
+      institution
+    });
+
   } catch (error) {
     res.status(500).send(error.message);
   }

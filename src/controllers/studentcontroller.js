@@ -142,25 +142,6 @@
 //   }
 // };
 
-// // ================= DELETE =================
-// exports.deleteStudent = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const deletedStudent = await Student.findByIdAndDelete(id);
-
-//     if (!deletedStudent) {
-//       return res.status(404).json({ message: "Student not found" });
-//     }
-
-//     res.status(200).json({
-//       message: "Student deleted successfully"
-//     });
-
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Student = require("../models/student");
