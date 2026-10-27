@@ -25,6 +25,10 @@ exports.registerInsti = async (req, res) => {
       description
     });
 
+    if (req.file) {
+      institution.profileImage = req.file.filename;
+    }
+
     await institution.save();
 
     res.status(201).json({

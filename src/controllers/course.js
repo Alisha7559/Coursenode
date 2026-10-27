@@ -7,7 +7,7 @@ exports.createCourse = async (req, res) => {
 
   console.log("FILES:", req.files);
   try {
-    const { courseName, category, subcategory, fees, totalSeats, mode, status,duration, location, description } = req.body;
+    const { courseName, category, subcategory, fees, totalSeats, mode, level,status,duration, location, description } = req.body;
 
     
     const images = req.files ? req.files.map(f => `uploads/${f.filename}`) : [];
@@ -27,7 +27,7 @@ const course = await Course.create({
   institution: new mongoose.Types.ObjectId(req.user.id),
   fees,
   totalSeats,
-  mode,
+  mode,level,
   status,
   duration,
  skills,
@@ -106,6 +106,43 @@ exports.getAllCourses = async (req, res) => {
     });
   }
 };
+/* SEARCH COURSE */
+exports.searchCourse = async (req, res) => {
+
+  try {
+
+    const query = req.query.query;
+
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: "Search query is required"
+      });
+    }
+
+    const courses = await Course.find({
+      courseName: { $regex: query, $options: "i" }
+    })
+      .populate("category", "name")
+      .populate("subcategory", "name")
+      .populate("institution", "name email description");
+
+    res.status(200).json({
+      success: true,
+      data: courses
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Search failed",
+      error: error.message
+    });
+
+  }
+
+};
 // get a single course
 exports.getSingleCourseById = async (req, res) => {
 
@@ -158,7 +195,7 @@ exports.updateCourse = async (req, res) => {
       fees,
       totalSeats,
       mode,
-     
+     level,
       duration,
       status,
       
@@ -202,6 +239,7 @@ if (req.body.skills) {
         totalSeats,
         mode,
         status,
+        level,
        skills,duration,
         location,
         description,
@@ -255,5 +293,4 @@ exports.deleteCourse = async (req, res) => {
       error: error.message
     });
   }
-}; 
-
+};

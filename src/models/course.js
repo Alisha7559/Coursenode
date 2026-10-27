@@ -74,6 +74,10 @@ subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "CourseSubCategory", r
 description: {
   type: String
 },
+level: {
+  type: String,
+  enum: ["Beginner", "Intermediate", "Advanced"]
+},
 //   ratingAverage: {
 //     type: Number,
 //     default: 0

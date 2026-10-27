@@ -87,11 +87,11 @@ const institutionSchema = new Schema(
     },
      oldPassword: {
       type: String,
-      required: true
+      required: false
     },
      newPassword: {
       type: String,
-      required: true
+      required: false
     },
 
   phone: {

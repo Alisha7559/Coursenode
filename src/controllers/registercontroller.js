@@ -77,14 +77,14 @@ exports.getRegisteredStudents = async (req, res) => {
 
     const registrations = await Register.find()
       .populate("studentId", "studentname email")
-     .populate({
-  path: "courseId",
-  select: "courseName subcategory",
-  populate: {
-    path: "subcategory",
-    select: "name"
-  }
-})
+      .populate({
+        path: "courseId",
+        select: "courseName fees subcategory",
+        populate: {
+          path: "subcategory",
+          select: "name"
+        }
+      });
 
     res.json(registrations);
 
@@ -98,33 +98,26 @@ exports.getRegisteredStudents = async (req, res) => {
 exports.getInstitutionStudents = async (req, res) => {
   try {
 
-    // ✅ ADD THIS LINE HERE
-    console.log("Logged Institution:", req.user);
+    const institutionId = req.user.id;
 
-    const institutionId = req.user.id; // logged-in institution
-    console.log("Institution ID:", institutionId);
-
-    // 1️⃣ Get all courses of this institution
     const courses = await Course.find({ institution: institutionId }).select("_id");
 
-    console.log("Courses found:", courses); // optional debug
-
     if (!courses.length) {
-      return res.json([]); // No courses → no students
+      return res.json([]);
     }
 
     const courseIds = courses.map(c => c._id);
 
-    // 2️⃣ Find registrations
     const registrations = await Register.find({ courseId: { $in: courseIds } })
       .populate("studentId", "studentname email")
       .populate({
         path: "courseId",
-        select: "courseName subcategory",
-        populate: { path: "subcategory", select: "name" }
+        select: "courseName fees subcategory",
+        populate: {
+          path: "subcategory",
+          select: "name"
+        }
       });
-
-    console.log("Registrations:", registrations); // optional debug
 
     res.status(200).json(registrations);
 
@@ -136,3 +129,80 @@ exports.getInstitutionStudents = async (req, res) => {
     });
   }
 };
+exports.updateRegistrationStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const updated = await Register.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    )
+      .populate("studentId", "studentname email")
+      .populate({
+        path: "courseId",
+        select: "courseName fees subcategory",
+        populate: {
+          path: "subcategory",
+          select: "name"
+        }
+      });
+
+    if (!updated) {
+      return res.status(404).json({
+        message: "Registration not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      data: updated
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+exports.deleteRegistration = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const registration = await Register.findById(id);
+
+    if (!registration) {
+      return res.status(404).json({
+        message: "Registration not found",
+      });
+    }
+
+    // Remove student from course
+    const course = await Course.findById(registration.courseId);
+
+    if (course && course.enrolledStudents) {
+      course.enrolledStudents = course.enrolledStudents.filter(
+        (studentId) => studentId.toString() !== registration.studentId.toString()
+      );
+
+      await course.save();
+    }
+
+    await Register.findByIdAndDelete(id);
+
+    res.json({
+      success: true,
+      message: "Registration deleted successfully",
+    });
+
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+
+

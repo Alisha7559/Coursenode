@@ -1,21 +1,51 @@
-const express = require ("express");
+const express = require("express");
 const router = express.Router();
 
 const courseController = require("../controllers/course");
 
 const upload = require("../middleware/upload");
+const auth = require("../middleware/auth");
 
-const auth=require("../middleware/auth");
+/* ================= CREATE COURSE ================= */
 
+router.post(
+  "/institute/course",
+  auth,
+  upload.array("images"),
+  courseController.createCourse
+);
 
-// ✅ CREATE COURSE (FIXED)
-router.post("/institute/course", auth, upload.array("images"), courseController.createCourse);
+/* ================= GET ALL COURSES ================= */
 
-router.get("/institute/allcourse", auth, courseController.getAllCourses);
+router.get(
+  "/institute/allcourse",
+  auth,
+  courseController.getAllCourses
+);
 
-router.get("/institute/course", auth, courseController.getCourseById);
+/* ================= GET COURSES BY INSTITUTE ================= */
 
-router.get("/course/:id",courseController. getSingleCourseById);
+router.get(
+  "/institute/course",
+  auth,
+  courseController.getCourseById
+);
+
+/* ================= GET SINGLE COURSE ================= */
+
+router.get(
+  "/course/:id",
+  courseController.getSingleCourseById
+);
+
+/* ================= SEARCH COURSE (NEW) ================= */
+
+router.get(
+  "/course/search",
+  courseController.searchCourse
+);
+
+/* ================= UPDATE COURSE ================= */
 
 router.put(
   "/update/:id",
@@ -23,7 +53,13 @@ router.put(
   upload.array("images"),
   courseController.updateCourse
 );
-router.delete("/institute/course/:id", auth, courseController.deleteCourse);
 
+/* ================= DELETE COURSE ================= */
 
-module.exports = router; 
+router.delete(
+  "/institute/course/:id",
+  auth,
+  courseController.deleteCourse
+);
+
+module.exports = router;

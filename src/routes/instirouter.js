@@ -6,7 +6,7 @@ const upload = require("../middleware/upload");
 
 
 /* ========= AUTH ROUTES ========= */
-router.post("/register", instiController.registerInsti);
+router.post("/register", upload.single("profileImage"), instiController.registerInsti);
 router.post("/institution/login", instiController.loginInsti);
 
 /* ========= READ ROUTES ========= */

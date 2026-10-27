@@ -94,7 +94,7 @@ exports.getMyFeedback = async (req, res) => {
     const feedbacks = await Feedback.find({ studentid: req.user.id })
       .populate({ path: "studentid", select: "studentname email" })
       .populate({ path: "courseid", select: "courseName" })
-     .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -114,7 +114,7 @@ exports.getPublicFeedback = async (req, res) => {
     const feedbacks = await Feedback.find()
       .populate({ path: "studentid", select: "studentname email" }) // ✅ Use studentname
       .populate({ path: "courseid", select: "courseName" })
-     .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -127,3 +127,30 @@ exports.getPublicFeedback = async (req, res) => {
     });
   }
 };
+/* ================= GET FEEDBACK FOR A SPECIFIC COURSE ================= */
+exports.getCourseFeedback = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid course ID",
+      });
+    }
+
+    const feedbacks = await Feedback.find({ courseid: courseId })
+      .populate({ path: "studentid", select: "studentname email" })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: feedbacks,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}

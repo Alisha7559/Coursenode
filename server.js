@@ -21,6 +21,8 @@ const registerRoutes = require("./src/routes/registerRoutes");
 const supportRoutes = require("./src/routes/supportRoutes"); // ✅ only once
 
 const institutionMail = require("./src/routes/nodemailerRoutes"); 
+const aiRoutes = require("./src/routes/aiRoutes");
+const trackingRoutes = require("./src/routes/trackingRoutes");
 
 const app = express();
 const port = process.env.PORT || 7000;
@@ -71,6 +73,12 @@ app.use("/api", registerRoutes);
 app.use("/api", supportRoutes);
 
 app.use("/api", institutionMail);
+
+/* ✅ AI PROXY ROUTES */
+app.use("/api/ai", aiRoutes);
+
+/* ✅ BEHAVIOUR TRACKING FOR AI */
+app.use("/api/tracking", trackingRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
